@@ -9,21 +9,107 @@ const AuthPage = () => {
   const navigate = useNavigate();
   const [user, setUser] = useState(true);
 
+  // ------------------------------------
+  const [credentials, setCredentials] = useState({
+    phone: "",
+    password: "",
+  });
+  console.log('credentials' , credentials);
+  const [buttonDisable, setButtonDisable] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  const onLogin = async (e) => {
+    e.preventDefault();
+    if (!validateNumber(user.phone.trim())) {
+      toast.error("Invalid phone number format");
+      return;
+    }
+    if (user.password.length < 6) {
+      toast.error("Password must be at least 6 characters long");
+      return;
+    }
+
+    try {
+      setLoading(true);
+      setButtonDisabled(true);
+      const res = await axios.post("/api/user/login", credentials);
+      toast.success("Login successful!");
+      navigate("/dashboard");
+    } catch (error) {
+      console.error("Login failed:", error);
+      toast.error(
+        error.response?.data?.message || "Login failed. Please try again."
+      );
+    } finally {
+      setButtonDisabled(false);
+      setLoading(false);
+    }
+  };
+
+  const validateNumber = (phone) => {
+    const re = /^\d{10}$/;
+    return re.test(phone);
+  };
+
+  // Register
+
+  const [regCredentials, setRegCredentials] = useState({
+    phone: "",
+    password: "",
+    confirmPassword: "",
+  });
+  const [regButtonDisabled, setRegButtonDisabled] = useState(false);
+  const [regLoading, setRegLoading] = useState(false);
+
+  const onRegister = async (e) => {
+    e.preventDefault();
+    if (!validateNumber(user.phone.trim())) {
+      toast.error("Invalid phone number format");
+      return;
+    }
+    if (user.password.length < 6) {
+      toast.error("Password must be at least 6 characters long");
+      return;
+    }
+    if (user.password !== user.confirmPassword) {
+      toast.error("Passwords do not match");
+      return;
+    }
+
+    try {
+      setRegLoading(true);
+      setRegButtonDisabled(true);
+      const res = await axios.post("/api/user/register", regCredentials);
+      toast.success("register successful!");
+      navigate("/question");
+    } catch (error) {
+      console.error("Register failed:", error);
+      toast.error(
+        error.response?.data?.message || "Register failed. Please try again."
+      );
+    } finally {
+      setButtonDisabled(false);
+      setLoading(false);
+    }
+  };
+
+  // ------------------------------------
+
   const backHandler = () => {
     navigate("/");
   };
   const ToggleForm = () => {
     setUser(!user);
   };
-  const LoginHandler = (e) => {
-    e.preventDefault();
-    console.log("Login");
-  };
-  const HandlerRegister = (e) => {
-    e.preventDefault();
-    navigate("/question");
-    console.log("Register");
-  };
+  // const LoginHandler = (e) => {
+  //   e.preventDefault();
+  //   console.log("Login");
+  // };
+  // const HandlerRegister = (e) => {
+  //   e.preventDefault();
+  //   navigate("/question");
+  //   console.log("Register");
+  // };
   const formVariants = {
     hidden: { opacity: 0, x: "-100vw" },
     visible: { opacity: 1, x: 0, transition: { duration: 1 } },
@@ -32,6 +118,7 @@ const AuthPage = () => {
     hidden: { opacity: 0, x: "100vw" },
     visible: { opacity: 1, x: 0, transition: { duration: 0.7 } },
   };
+
   return (
     <Box
       sx={{
@@ -78,11 +165,17 @@ const AuthPage = () => {
           <Typography sx={{ fontSize: 15, marginTop: 1 }}>
             Enter Your details to start with the VCAN
           </Typography>
-          <form style={{ marginTop: 25, width: "100%" }}>
+          <form 
+          onSubmit={onLogin}
+          style={{ marginTop: 25, width: "100%" }}>
             <TextField
               required
               fullWidth
               label="Phone"
+              value={credentials.phone}
+              onChange={(e) =>
+                setCredentials({ ...credentials, phone: e.target.value })
+              }
               variant="outlined"
               margin="normal"
               InputProps={{ style: { borderRadius: 25 } }}
@@ -105,6 +198,10 @@ const AuthPage = () => {
             <TextField
               required
               fullWidth
+              value={credentials.password}
+              onChange={(e) =>
+                setCredentials({ ...credentials, password: e.target.value })
+              }
               label="Password"
               type="password"
               variant="outlined"
@@ -127,8 +224,9 @@ const AuthPage = () => {
               }}
             />
             <Button
-              onClick={LoginHandler}
+              // onClick={LoginHandler}
               variant="container"
+              disabled={buttonDisable}
               type="submit"
               sx={{
                 backgroundColor: "#2C3930",
@@ -181,7 +279,7 @@ const AuthPage = () => {
           }}
         >
           <Paper
-          onClick={backHandler}
+            onClick={backHandler}
             elevation={5}
             sx={{
               width: 45,
@@ -200,10 +298,16 @@ const AuthPage = () => {
           <Typography sx={{ fontSize: 15, marginTop: 1 }}>
             Enter Your details to start with the VCAN
           </Typography>
-          <form style={{ marginTop: 25, width: "100%" }}>
+          <form 
+          onSubmit={onRegister}
+          style={{ marginTop: 25, width: "100%" }}>
             <TextField
               required
               fullWidth
+              value={regCredentials.phone}
+              onChange={(e) =>
+                setRegCredentials({ ...regCredentials, phone: e.target.value })
+              }
               label="Phone"
               variant="outlined"
               margin="normal"
@@ -227,6 +331,13 @@ const AuthPage = () => {
             <TextField
               required
               fullWidth
+              value={regCredentials.password}
+              onChange={(e) =>
+                setRegCredentials({
+                  ...regCredentials,
+                  password: e.target.value,
+                })
+              }
               label="Password"
               type="password"
               variant="outlined"
@@ -251,6 +362,13 @@ const AuthPage = () => {
             <TextField
               required
               fullWidth
+              value={regCredentials.confirmPassword}
+              onChange={(e) =>
+                setRegCredentials({
+                  ...regCredentials,
+                  confirmPassword: e.target.value,
+                })
+              }
               label="Confirm Password"
               type="password"
               variant="outlined"
@@ -274,6 +392,7 @@ const AuthPage = () => {
             />
             <Button
               onClick={HandlerRegister}
+              disabled={regButtonDisabled}
               variant="container"
               type="submit"
               sx={{

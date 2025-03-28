@@ -2,6 +2,8 @@ import { Button, Typography } from "@mui/material";
 import React from "react";
 import { useNavigate } from "react-router-dom";
 
+
+//add the logic that if user exist then ,dont show the login btns
 const Navbar = () => {
   const navigate=useNavigate()
   const loginHandler=()=>{
@@ -122,7 +124,7 @@ const Navbar = () => {
           }}
         >
           <Typography sx={{ fontWeight: 700, fontSize: 17, color: "#000" }}>
-            SignIn
+            SignUp
           </Typography>
         </Button>
       </div>

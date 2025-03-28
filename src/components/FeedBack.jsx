@@ -1,8 +1,38 @@
-import React from "react";
+import React, { useState } from "react";
 import { TextField, Button, Typography } from "@mui/material";
+import axios from "axios";
 import FeedbackImage from "../assets/feedback.jpg"; // Ensure the image exists
 
 const FeedBack = () => {
+  const [ FeedBack, setFeedback ] = useState({
+    fName: "",
+    lName: "",
+    phone: "",
+    message: "",
+  });
+  console.log('FeedBack : ',FeedBack)
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (
+      FeedBack.fName.length === 0 ||
+      FeedBack.lName.length === 0 ||
+      FeedBack.phone.length != 10 ||
+      FeedBack.message.length === 0
+    ) {
+      alert("Please fill all the fields");
+    } else {
+      try {
+        const res = await axios.post("/api/feedback", FeedBack);
+        console.log(res);
+        alert("Feedback submitted successfully");
+        setFeedback({ fName: "", lName: "", phone: "", message: "" }); // Reset form
+      } catch (error) {
+        console.error("Error submitting feedback:", error);
+        alert("Failed to submit feedback");
+      }
+    }
+  };
+
   return (
     <div
       style={{
@@ -64,15 +94,36 @@ const FeedBack = () => {
             Share Your Feedback
           </Typography>
 
-          <form>
+          {/* <-- add this line */}
+          <form onSubmit={handleSubmit}>
             <div style={{ display: "flex", gap: "10px", marginBottom: "15px" }}>
-              <TextField fullWidth label="First Name" variant="outlined" />
-              <TextField fullWidth label="Last Name" variant="outlined" />
+              <TextField
+                value={FeedBack.fName}
+                onChange={(e) =>
+                  setFeedback({ ...FeedBack, fName: e.target.value })
+                }
+                fullWidth
+                label="First Name"
+                variant="outlined"
+              />
+              <TextField
+                value={FeedBack.lName}
+                onChange={(e) =>
+                  setFeedback({ ...FeedBack, lName: e.target.value })
+                }
+                fullWidth
+                label="Last Name"
+                variant="outlined"
+              />
             </div>
 
             <TextField
               fullWidth
               label="Phone"
+              value={FeedBack.phone}
+              onChange={(e) =>
+                setFeedback({ ...FeedBack, phone: e.target.value })
+              }
               variant="outlined"
               type="tel"
               sx={{ marginBottom: 2 }}
@@ -81,6 +132,10 @@ const FeedBack = () => {
             <TextField
               fullWidth
               label="Message"
+              value={FeedBack.message}
+              onChange={(e) =>
+                setFeedback({ ...FeedBack, message: e.target.value })
+              }
               variant="outlined"
               multiline
               rows={4}
@@ -89,6 +144,7 @@ const FeedBack = () => {
 
             <Button
               variant="contained"
+              type="submit" // <-- add this line
               color="primary"
               fullWidth
               sx={{ padding: "10px", fontSize: "16px", fontWeight: "600" }}

@@ -26,6 +26,7 @@
     "@nivo/geo": "^0.88.0",
     "@nivo/line": "^0.88.0",
     "@tailwindcss/vite": "^4.0.15",
+    "axios": "^1.8.4",
     "formik": "^2.4.6",
     "framer-motion": "^12.5.0",
     "react": "^19.0.0",
